@@ -2,18 +2,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			token: null
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -33,20 +22,40 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log("Error loading message from backend", error)
 				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+			
+			// handle the process requesting a token
+			// if successful, it will put the token string
+			// in the store to allow for future use
+			login: async (email, password) => {
+				const options = {
+					method: 'POST',
+					mode: 'cors',
+					headers : {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						email: email,
+						password: password
+					})
+				}
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+				const response = await fetch('http://localhost:3001/api/token', options)
 
-				//reset the global store
-				setStore({ demo: demo });
+				if (!response.ok) {
+					console.log("Error: ", response.statusText, response.status)
+					return false;
+				}
+
+				const data = await response.json();
+				console.log('This came from the backend: ', data);
+				setStore({token: data.access_token})
+				return true;
 			}
+
+
+			// signup action
+			// validation action
+			// logout action
 		}
 	};
 };
