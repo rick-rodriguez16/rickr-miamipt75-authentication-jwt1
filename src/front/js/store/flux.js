@@ -1,8 +1,8 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			message: null,
-			token: null
+			token: null,
+			loginMessage: null,
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -48,7 +48,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				const data = await response.json();
 				console.log('This came from the backend: ', data);
-				setStore({token: data.access_token})
+				setStore({
+					token: data.access_token,
+					loginMessage: data.msg
+				})
+				
 				return true;
 			}
 
