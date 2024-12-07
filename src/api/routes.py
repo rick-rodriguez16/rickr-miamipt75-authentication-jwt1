@@ -50,6 +50,52 @@ def generate_token():
 
     return jsonify(response)
 
+# /signup POST
+# create a route for /signup that will add a user's email and password to the DB
+@api.route('/signup', methods=["POST"])
+def register_user():
+
+    # receive the request and convert the body of the request
+    # into json format
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+
+    # query to check if email already exists
+    email = email.lower()
+    user = User.query.filter_by(email=email).first()
+
+    # make a condition that the user is not None and that the email exists
+    if user is not None and user.email == email:
+        response = {
+            'msg': 'User already exists'
+        }
+        return jsonify(response), 403
+
+    # if the email does not exist, go ahead and make a new record in the DB
+    # let's sign this person up
+    user = User()
+    user.email = email
+    user.password = password
+    user.is_active = True
+    db.session.add(user)
+    db.session.commit()
+
+    response = {
+        'msg': f'Congratulations, {user.email}! You have successfully signed up!'
+    }
+    return jsonify(response), 200
+
+
+
+
+
+
+
+
+
+
+
+
 # Protect a route with jwt_required, which will kick out requests
 # without a valid JWT present.
 # create a route for /private the will display the private page
@@ -60,6 +106,15 @@ def protected():
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+
+
+
+
+
+
+
+
 
 
 

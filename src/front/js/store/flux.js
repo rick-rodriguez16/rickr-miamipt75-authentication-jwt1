@@ -3,6 +3,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		store: {
 			token: null,
 			loginMessage: null,
+			signUpMessage: null
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -54,10 +55,41 @@ const getState = ({ getStore, getActions, setStore }) => {
 				})
 				
 				return true;
+			},
+
+			signUp: async(email, password) => {
+				const options = {
+					method: 'POST',
+					mode: 'cors',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						email: email,
+						password: password
+					})
+				}
+
+				const response = await fetch('https://supreme-sniffle-p5p455xqq56c75rx-3001.app.github.dev/api/signup', options)
+
+				if(!response.ok) {
+					const data = await response.json()
+					return {
+						error: {
+							status: response.status,
+							statusText: response.statusText
+						}
+					}
+				}
+
+				const data = await response.json()
+				setStore({
+					signUpMessage: data.msg
+				})
+				return data;
 			}
 
 
-			// signup action
 			// validation action
 			// logout action
 		}
